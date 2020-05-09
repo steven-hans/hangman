@@ -1,6 +1,7 @@
 package me.stevenhans.hangman;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -110,8 +111,14 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     private void setupKeyTypedEvent() {
         stage.addListener(new InputListener() {
             @Override
-            public boolean keyTyped(InputEvent event, char character) {
-                if (Character.isLetter(character)) {
+            public boolean keyDown(InputEvent event, int keycode) {
+                char character = Character.toLowerCase(Input.Keys.toString(keycode).charAt(0));
+                if (keycode == Input.Keys.ESCAPE) {
+                    game.restartGame();
+                    loseMusic.stop();
+                    backgroundMusic.stop();
+                    parent.changeScreen(ScreenSection.MENU);
+                } else if (Character.isLetter(character)) {
                     if (!game.isFinished()) {
                         lastGuessResult = game.guess(Character.toLowerCase(character));
                         if (lastGuessResult == GuessResult.CORRECT) {
@@ -134,7 +141,8 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
                         }
                     }
                 }
-                return super.keyTyped(event, character);
+
+                return super.keyDown(event, keycode);
             }
         });
     }
