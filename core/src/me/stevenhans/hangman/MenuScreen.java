@@ -43,7 +43,7 @@ public class MenuScreen extends SwitchableScreen implements Screen {
         startGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                parent.changeScreen(ScreenSection.GAMEPLAY);
+                parent.changeScreen(ScreenSection.LOADING);
             }
         });
     }

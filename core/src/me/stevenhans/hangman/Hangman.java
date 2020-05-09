@@ -38,8 +38,7 @@ public class Hangman extends Game {
 
     @Override
     public void create() {
-        loadingScreen = new LoadingScreen(this);
-        setScreen(loadingScreen);
+        changeScreen(ScreenSection.MENU);
     }
 
     @Override

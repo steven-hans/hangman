@@ -17,24 +17,36 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GameplayScreen extends SwitchableScreen implements Screen {
-    private ArrayList<Texture> stick;
-    private ArrayList<String> wordlist;
+    protected static ArrayList<String> wordlist;
+    protected static ArrayList<Texture> stick;
+    protected static Music backgroundMusic;
+    protected static Music loseMusic;
+    protected static Sound type_correct;
+    protected static Sound type_incorrect;
+    protected static BitmapFont guessFont;
+    protected static BitmapFont infoFont;
     private SpriteBatch batch;
-    private BitmapFont guessFont;
-    private BitmapFont infoFont;
     private GuessResult lastGuessResult;
-    private Music backgroundMusic;
-    private Music loseMusic;
-
-    private Sound type_correct;
-    private Sound type_incorrect;
-
     private HangmanGame game;
+
+    /**
+     * Saat screen gameplay dikonstruksi, maka game akan memuat wordlist, memuat gambar stick yang akan digambar,
+     * memuat font, memuat musik yang ada, dan mengatur event saat player menekan tombol pada keyboard.
+     *
+     * @param hangman hangman.
+     */
+    public GameplayScreen(Hangman hangman) {
+        super(hangman);
+        batch = new SpriteBatch();
+        game = new HangmanGame(wordlist);
+
+        setupKeyTypedEvent();
+    }
 
     /**
      * Memuat font yang akan digunakan pada game.
      */
-    private void setupFont() {
+    protected static void setupFont() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("PTSerif-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 45;
@@ -55,16 +67,27 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     /**
      * Memuat suara feedback saat pemain menekan alfabet di keyboard.
      */
-    private void loadSounds() {
+    protected static void loadSounds() {
         type_correct = Gdx.audio.newSound(Gdx.files.internal("sound/type_correct.mp3"));
         type_incorrect = Gdx.audio.newSound(Gdx.files.internal("sound/type_incorrect.mp3"));
+    }
+
+    /**
+     * Memuat daftar kata yang akan ditampilkan pada game.
+     * Nama file dari daftar ini adalah wordlist.txt.
+     */
+    protected static void loadWordList() {
+        FileHandle file = Gdx.files.internal("wordlist.txt");
+        String text = file.readString();
+
+        wordlist = new ArrayList<>(Arrays.asList(text.split("\n")));
     }
 
     /**
      * Memuat gambar-gambar hangman yang akan ditampilkan pada game.
      * Gambar-gambar ini meliputi: 0.png, 1.png, ..., 5.png.
      */
-    private void loadStickAsset() {
+    protected static void loadStickAsset() {
         stick = new ArrayList<>();
         for (int i = 0; i <= 5; ++i) {
             stick.add(new Texture(Gdx.files.internal("stick/" + i + ".png")));
@@ -72,21 +95,9 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     }
 
     /**
-     * Memuat daftar kata yang akan ditampilkan pada game.
-     * Nama file dari daftar ini adalah wordlist.txt.
-     */
-    private void loadWordList() {
-        FileHandle file = Gdx.files.internal("wordlist.txt");
-        String text = file.readString();
-
-        wordlist = new ArrayList<>(Arrays.asList(text.split("\n")));
-
-    }
-
-    /**
      * Memuat lagu yang akan diputar pada game.
      */
-    private void setupMusic() {
+    protected static void setupMusic() {
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/aku_bersyukur.mp3"));
         backgroundMusic.setLooping(true);
         loseMusic = Gdx.audio.newMusic(Gdx.files.internal("music/circus_song.mp3"));
@@ -129,24 +140,6 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     }
 
     /**
-     * Saat screen gameplay dikonstruksi, maka game akan memuat wordlist, memuat gambar stick yang akan digambar,
-     * memuat font, memuat musik yang ada, dan mengatur event saat player menekan tombol pada keyboard.
-     * @param hangman hangman.
-     */
-    public GameplayScreen(Hangman hangman) {
-        super(hangman);
-        batch = new SpriteBatch();
-        loadWordList();
-        game = new HangmanGame(wordlist);
-
-        loadStickAsset();
-        setupFont();
-        setupKeyTypedEvent();
-        setupMusic();
-        loadSounds();
-    }
-
-    /**
      * Memainkan musik awal saat layar ini pertama kali muncul.
      */
     @Override
@@ -167,7 +160,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     private void drawScore() {
         String scoreText = "Score: " + game.getScore();
 
-        infoFont.draw(batch, scoreText, Gdx.graphics.getWidth()-90, Gdx.graphics.getHeight()-20);
+        infoFont.draw(batch, scoreText, Gdx.graphics.getWidth() - 90, Gdx.graphics.getHeight() - 20);
     }
 
     /**
