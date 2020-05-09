@@ -24,10 +24,11 @@ public class LoadingScreen extends SwitchableScreen implements Screen {
         if (GameplayScreen.wordlist == null) {
             loadStickAsset();
             setupFont();
-            setupMusic();
             loadSounds();
             loadWordList();
         }
+
+        setupMusic();
     }
 
     private void showLoadingScreen() {

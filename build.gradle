@@ -18,7 +18,7 @@ buildscript {
 allprojects {
     apply plugin: "eclipse"
 
-    version = '1.6.1-alpha'
+    version = '1.7.0-alpha'
     ext {
         appName = "hangman"
         gdxVersion = '1.9.10'

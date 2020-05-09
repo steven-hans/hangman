@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GameplayScreen extends SwitchableScreen implements Screen {
     protected static ArrayList<String> wordlist;
@@ -104,7 +105,8 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
      * Memuat lagu yang akan diputar pada game.
      */
     protected static void setupMusic() {
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/aku_bersyukur.mp3"));
+        int trackNo = ThreadLocalRandom.current().nextInt(1, 11);
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/"+ trackNo + ".mp3"));
         backgroundMusic.setLooping(true);
         loseMusic = Gdx.audio.newMusic(Gdx.files.internal("music/circus_song.mp3"));
         loseMusic.setLooping(true);
