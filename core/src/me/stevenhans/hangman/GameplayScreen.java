@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
@@ -125,6 +124,8 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
                     loseMusic.stop();
                     backgroundMusic.stop();
                     parent.changeScreen(ScreenSection.MENU);
+                } else if (keycode == Input.Keys.SHIFT_LEFT || keycode == Input.Keys.SHIFT_RIGHT) {
+                    if (canHint()) game.doHint();
                 } else if (Input.Keys.A <= keycode && keycode <= Input.Keys.Z) {
                     if (!game.isFinished()) {
                         lastGuessResult = game.guess(Character.toLowerCase(character));
@@ -156,11 +157,11 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
 
     private void setupHintButton() {
         Skin skin = new Skin((Gdx.files.internal("skin/skin.json")));
-        hintButton = new TextButton("Hint", skin);
+        hintButton = new TextButton("Hint (shift)", skin);
         hintButton.setWidth(128);
         hintButton.setHeight(64);
 
-        hintButton.setPosition(Gdx.graphics.getWidth() - 256, Gdx.graphics.getHeight()-310);
+        hintButton.setPosition(Gdx.graphics.getWidth() - 256, Gdx.graphics.getHeight() - 310);
         stage.addActor(hintButton);
         hintButton.setVisible(false);
 
@@ -259,10 +260,20 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     }
 
     /**
+     * Menentukan apakah hint dapat dipakai sekarang atau tidak.
+     * Hint dapat dipakai apabila score > 20.
+     *
+     * @return true, apabila ya, false, apabila sebaliknya.
+     */
+    private boolean canHint() {
+        return (!game.isFinished() && game.getScore() > 20);
+    }
+
+    /**
      * Menampilkan button hint apabila score lebih dari 20 selama game masih berlangsung.
      */
     private void handleHintButton() {
-        if (!game.isFinished() && game.getScore() > 20) {
+        if (canHint()) {
             hintButton.setVisible(true);
         } else {
             hintButton.setVisible(false);
