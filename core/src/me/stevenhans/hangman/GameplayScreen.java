@@ -36,7 +36,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
         parameter.size = 50;
         guessFont = generator.generateFont(parameter);
 
-        parameter.size = 18;
+        parameter.size = 20;
         infoFont = generator.generateFont(parameter);
 
         generator.dispose();
@@ -142,6 +142,15 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     }
 
     /**
+     * Menampilkan score pada game.
+     */
+    private void drawScore() {
+        String scoreText = "Score: " + game.getScore();
+
+        infoFont.draw(batch, scoreText, Gdx.graphics.getWidth()-90, Gdx.graphics.getHeight()-20);
+    }
+
+    /**
      * Menampilkan teks informasi di samping stick figure.
      */
     private void drawSideText() {
@@ -206,6 +215,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
         drawStick();
         drawSideText();
         handleMusic();
+        drawScore();
         drawCurrentFill();
         batch.end();
     }

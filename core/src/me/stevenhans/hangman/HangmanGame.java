@@ -52,6 +52,11 @@ public class HangmanGame {
      */
     private StringBuilder currentFill;
 
+    /**
+     * Score menyimpan tebakan yang berhasil ditebak pemain.
+     */
+    private int score = 0;
+
     public HangmanGame(ArrayList<String> wordlist) {
         this.wordlist = wordlist;
         guessed = new TreeSet<>();
@@ -64,6 +69,11 @@ public class HangmanGame {
      */
     public void restartGame() {
         life = 5;
+
+        if (guessed.size() > 0 && !isWin()) {
+            score = 0;
+        }
+
         guessed.clear();
         int rand = ThreadLocalRandom.current().nextInt(0, this.wordlist.size());
         currentWord = this.wordlist.get(rand);
@@ -150,6 +160,7 @@ public class HangmanGame {
             guessed.add(guess);
             if (currentWord.contains(String.valueOf(c))) {
                 fillGuess(c);
+                if (isWin()) score++;
                 return GuessResult.CORRECT;
             } else {
                 decreaseLife();
@@ -172,5 +183,20 @@ public class HangmanGame {
      */
     public boolean isWin() {
         return currentFill.toString().equalsIgnoreCase(currentWord);
+    }
+
+    /**
+     * Mengembalikan score pemain saat itu juga.
+     * @return score game.
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Melakukan reset pada score.
+     */
+    public void resetScore() {
+        score = 0;
     }
 }
