@@ -168,7 +168,10 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     private void drawScore() {
         String scoreText = "Score: " + game.getScore();
 
-        infoFont.draw(batch, scoreText, Gdx.graphics.getWidth() - 90, Gdx.graphics.getHeight() - 20);
+        if (game.getStrike() > 0) {
+            scoreText += "\nStrike: " + game.getStrike();
+        }
+        infoFont.draw(batch, scoreText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 20);
     }
 
     /**

@@ -57,6 +57,11 @@ public class HangmanGame {
      */
     private int score = 0;
 
+    /**
+     * Jumlah huruf yang berhasil ditebak berturut-turut
+     */
+    private int strike = 0;
+
     public HangmanGame(ArrayList<String> wordlist) {
         this.wordlist = wordlist;
         guessed = new TreeSet<>();
@@ -69,6 +74,7 @@ public class HangmanGame {
      */
     public void restartGame() {
         life = 5;
+        strike = 0;
 
         if (guessed.size() > 0 && !isWin()) {
             score = 0;
@@ -160,14 +166,22 @@ public class HangmanGame {
             guessed.add(guess);
             if (currentWord.contains(String.valueOf(c))) {
                 fillGuess(c);
-                if (isWin()) score++;
+                score += 5*(++strike);
+                if (isWin()) score += 50;
                 return GuessResult.CORRECT;
             } else {
+                strike = 0;
                 decreaseLife();
                 return GuessResult.INCORRECT;
             }
         }
     }
+
+    /**
+     * Mengembalikan jumlah strike (huruf yang berhasil ditebak benar berturut-turut).
+     * @return jumlah strike sekarang.
+     */
+    public int getStrike() { return strike; }
 
     /**
      * Menentukan apabila permainan telah selesai atau belum.
