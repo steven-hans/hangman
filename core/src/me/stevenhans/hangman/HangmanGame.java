@@ -74,10 +74,10 @@ public class HangmanGame {
      */
     public void restartGame() {
         life = 5;
-        strike = 0;
 
         if (guessed.size() > 0 && !isWin()) {
             score = 0;
+            strike = 0;
         }
 
         guessed.clear();
