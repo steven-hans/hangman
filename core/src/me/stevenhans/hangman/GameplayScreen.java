@@ -11,8 +11,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +31,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     protected static Sound type_incorrect;
     protected static BitmapFont guessFont;
     protected static BitmapFont infoFont;
+    private TextButton hintButton;
     private SpriteBatch batch;
     private GuessResult lastGuessResult;
     private HangmanGame game;
@@ -113,12 +119,13 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 char character = Character.toLowerCase(Input.Keys.toString(keycode).charAt(0));
+
                 if (keycode == Input.Keys.ESCAPE) {
                     game.restartGame();
                     loseMusic.stop();
                     backgroundMusic.stop();
                     parent.changeScreen(ScreenSection.MENU);
-                } else if (Character.isLetter(character)) {
+                } else if (Input.Keys.A <= keycode && keycode <= Input.Keys.Z) {
                     if (!game.isFinished()) {
                         lastGuessResult = game.guess(Character.toLowerCase(character));
                         if (lastGuessResult == GuessResult.CORRECT) {
@@ -128,7 +135,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
                         }
                     } else {
                         if (character == 'r') {
-                            game.restartGame();
+                            game.nextGame();
                             loseMusic.stop();
                             backgroundMusic.play();
                         } else if (character == 'q') {
@@ -147,12 +154,32 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
         });
     }
 
+    private void setupHintButton() {
+        Skin skin = new Skin((Gdx.files.internal("skin/skin.json")));
+        hintButton = new TextButton("Hint", skin);
+        hintButton.setWidth(128);
+        hintButton.setHeight(64);
+
+        hintButton.setPosition(Gdx.graphics.getWidth() - 256, Gdx.graphics.getHeight()-310);
+        stage.addActor(hintButton);
+        hintButton.setVisible(false);
+
+        hintButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.doHint();
+            }
+        });
+    }
+
     /**
      * Memainkan musik awal saat layar ini pertama kali muncul.
      */
     @Override
     public void show() {
         backgroundMusic.play();
+
+        setupHintButton();
     }
 
     /**
@@ -231,6 +258,17 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
         }
     }
 
+    /**
+     * Menampilkan button hint apabila score lebih dari 20 selama game masih berlangsung.
+     */
+    private void handleHintButton() {
+        if (!game.isFinished() && game.getScore() > 20) {
+            hintButton.setVisible(true);
+        } else {
+            hintButton.setVisible(false);
+        }
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -242,6 +280,11 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
         drawScore();
         drawCurrentFill();
         batch.end();
+
+        handleHintButton();
+
+        stage.act();
+        stage.draw();
     }
 
     @Override

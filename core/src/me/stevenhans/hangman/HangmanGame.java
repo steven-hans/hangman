@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * HangmanGame adalah permainan game Hangman itu sendiri.
  * Kelas ini mengatur suatu game Hangman yang sedang dimainkan.
- *
+ * <p>
  * Singkatnya, Hangman adalah permainan tebak kata dimana pemain
  * akan diberikan suatu kata yang seluruh hurufnya tersembunyi.
  * Pemaini akan menebak huruf huruf dari kata ini dengan menebak huruf demi huruf.
@@ -41,13 +41,13 @@ public class HangmanGame {
 
     /**
      * currentFill adalah status tebakan pemain.
-     *
+     * <p>
      * Misalkan currentWord = "jazz"
-     *
+     * <p>
      * Pada awalnya, currentFill akan menjadi "_ _ _ _".
-     *
+     * <p>
      * Apabila pemain menebak huruf "a", maka currentFill akan menjadi "_ a _ _"
-     *
+     * <p>
      * dan seterusnya hingga permainan selesai.
      */
     private StringBuilder currentFill;
@@ -66,7 +66,16 @@ public class HangmanGame {
         this.wordlist = wordlist;
         guessed = new TreeSet<>();
 
-        restartGame();
+        setRandomWord();
+    }
+
+    /**
+     * Menentukan kata uang akan ditebak secara acak.
+     */
+    private void setRandomWord() {
+        int rand = ThreadLocalRandom.current().nextInt(0, this.wordlist.size());
+        currentWord = this.wordlist.get(rand);
+        currentFill = new StringBuilder(String.join("", Collections.nCopies(currentWord.length(), "_")));
     }
 
     /**
@@ -74,20 +83,30 @@ public class HangmanGame {
      */
     public void restartGame() {
         life = 5;
+        score = 0;
+        strike = 0;
+        guessed.clear();
+        setRandomWord();
+    }
 
-        if (guessed.size() > 0 && !isWin()) {
+    /**
+     * Melanjutkan permainan dengan kata baru.
+     */
+    public void nextGame() {
+        life = 5;
+
+        if (!isWin()) {
             score = 0;
             strike = 0;
         }
 
-        guessed.clear();
-        int rand = ThreadLocalRandom.current().nextInt(0, this.wordlist.size());
-        currentWord = this.wordlist.get(rand);
-        currentFill = new StringBuilder(String.join("", Collections.nCopies(currentWord.length(), "_")));
+        guessed.clear();;
+        setRandomWord();
     }
 
     /**
      * Mengambil kata yang sedang ditebak.
+     *
      * @return kata yang sedang ditebak.
      */
     public String getCurrentWord() {
@@ -96,13 +115,14 @@ public class HangmanGame {
 
     /**
      * Menampilkan status kata yang telah ditebak.
+     *
      * @return status tebakan kata (contoh: _ a _ _, untuk kata tebakan "jazz")
      */
     public String getCurrentFill() {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < currentFill.length(); ++i) {
             res.append(currentFill.charAt(i));
-            if (i != currentFill.length()-1) {
+            if (i != currentFill.length() - 1) {
                 res.append(" ");
             }
         }
@@ -111,6 +131,7 @@ public class HangmanGame {
 
     /**
      * Apabila pemain menebak dengan benar, maka akan ditampilkan huruf ini pada status tebakan kata.
+     *
      * @param c huruf yang ditebak.
      */
     private void fillGuess(char c) {
@@ -123,6 +144,7 @@ public class HangmanGame {
 
     /**
      * Mendapatkan kesempatan yang ada saat waktu itu.
+     *
      * @return jumlah kesempatan.
      */
     public int getLife() {
@@ -138,6 +160,7 @@ public class HangmanGame {
 
     /**
      * Mengembalikan jumlah huruf yang telah ditebak pemain.
+     *
      * @return
      */
     public int getNumberOfGuesses() {
@@ -147,13 +170,14 @@ public class HangmanGame {
     /**
      * Menebak huruf pada kata. Terdapat tiga hasil tebakan yang disesuaikan dengan GuessResult:
      * ALREADY_GUESSED, CORRECT, dan INCORRECT.
-     *
+     * <p>
      * Apabila ALREADY_GUESSED maka tidak ada konsekuensi pada permainan.
      * Apabila CORRECT, maka akan muncul huruf yang ditebak pada status tebakan kata.
      * Apabila INCORRECT, maka pemain akan dikurangi kesempatan tebakan salahnya dan ditampilkan gambar hangman
      * selanjutnya.
-     *
+     * <p>
      * Setiap tebakan akan dimasukkan pada himpunan tebakan guessed.
+     *
      * @param c huruf yang ditebak pemain.
      * @return hasil tebakan dalam GuessResult.
      */
@@ -166,7 +190,7 @@ public class HangmanGame {
             guessed.add(guess);
             if (currentWord.contains(String.valueOf(c))) {
                 fillGuess(c);
-                score += 5*(++strike);
+                score += 5 * (++strike);
                 if (isWin()) score += 50;
                 return GuessResult.CORRECT;
             } else {
@@ -179,12 +203,16 @@ public class HangmanGame {
 
     /**
      * Mengembalikan jumlah strike (huruf yang berhasil ditebak benar berturut-turut).
+     *
      * @return jumlah strike sekarang.
      */
-    public int getStrike() { return strike; }
+    public int getStrike() {
+        return strike;
+    }
 
     /**
      * Menentukan apabila permainan telah selesai atau belum.
+     *
      * @return true, apabila sudah selesai, false, apabila belum selesai.
      */
     public boolean isFinished() {
@@ -193,6 +221,7 @@ public class HangmanGame {
 
     /**
      * Menentukan apabila pemain menang dalam permainan sekarang.
+     *
      * @return true, apabila pemain menang dalam permainan sekarang, fase, apabila sebaliknya.
      */
     public boolean isWin() {
@@ -201,6 +230,7 @@ public class HangmanGame {
 
     /**
      * Mengembalikan score pemain saat itu juga.
+     *
      * @return score game.
      */
     public int getScore() {
@@ -212,5 +242,22 @@ public class HangmanGame {
      */
     public void resetScore() {
         score = 0;
+    }
+
+    /**
+     * Melakukan hint dan menampilkan salah satu huruf yang ada pada kata tebakan.
+     */
+    public void doHint() {
+        strike = 0;
+        int emptyIndex = 0;
+        for (int i = 0; i < currentFill.length(); ++i) {
+            if (currentFill.charAt(i) == '_') {
+                emptyIndex = i;
+                break;
+            }
+        }
+        score = score * 75 / 100;
+        guessed.add(currentWord.charAt(emptyIndex));
+        fillGuess(currentWord.charAt(emptyIndex));
     }
 }
