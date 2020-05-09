@@ -3,6 +3,7 @@ package me.stevenhans.hangman;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,6 +26,9 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     private Music backgroundMusic;
     private Music loseMusic;
 
+    private Sound type_correct;
+    private Sound type_incorrect;
+
     private HangmanGame game;
 
     /**
@@ -33,7 +37,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
     private void setupFont() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("PTSerif-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 50;
+        parameter.size = 45;
         guessFont = generator.generateFont(parameter);
 
         parameter.size = 20;
@@ -46,6 +50,14 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
 
         infoFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         infoFont.getData().setScale(0.85f, 0.85f);
+    }
+
+    /**
+     * Memuat suara feedback saat pemain menekan alfabet di keyboard.
+     */
+    private void loadSounds() {
+        type_correct = Gdx.audio.newSound(Gdx.files.internal("sound/type_correct.mp3"));
+        type_incorrect = Gdx.audio.newSound(Gdx.files.internal("sound/type_incorrect.mp3"));
     }
 
     /**
@@ -91,6 +103,11 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
                 if (Character.isLetter(character)) {
                     if (!game.isFinished()) {
                         lastGuessResult = game.guess(Character.toLowerCase(character));
+                        if (lastGuessResult == GuessResult.CORRECT) {
+                            type_correct.play();
+                        } else {
+                            type_incorrect.play();
+                        }
                     } else {
                         if (character == 'r') {
                             game.restartGame();
@@ -101,6 +118,8 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
                             loseMusic.stop();
                             backgroundMusic.stop();
                             parent.changeScreen(ScreenSection.MENU);
+                        } else {
+                            type_incorrect.play();
                         }
                     }
                 }
@@ -124,6 +143,7 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
         setupFont();
         setupKeyTypedEvent();
         setupMusic();
+        loadSounds();
     }
 
     /**
@@ -201,9 +221,9 @@ public class GameplayScreen extends SwitchableScreen implements Screen {
      */
     private void drawCurrentFill() {
         if (game.isFinished()) {
-            guessFont.draw(batch, game.getCurrentWord(), Gdx.graphics.getWidth() / 2 - 256, 96);
+            guessFont.draw(batch, game.getCurrentWord(), Gdx.graphics.getWidth() / 2 - 256, 100);
         } else {
-            guessFont.draw(batch, game.getCurrentFill(), Gdx.graphics.getWidth() / 2 - 256, 96);
+            guessFont.draw(batch, game.getCurrentFill(), Gdx.graphics.getWidth() / 2 - 256, 100);
         }
     }
 
