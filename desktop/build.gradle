@@ -1,0 +1,58 @@
+apply plugin: "java"
+
+sourceCompatibility = 1.8
+sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets.main.resources.srcDirs = ["../core/assets"]
+
+project.ext.mainClassName = "me.stevenhans.hangman.desktop.DesktopLauncher"
+project.ext.assetsDir = new File("../core/assets")
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'net.sf.proguard:proguard-gradle:6.2.2'
+    }
+}
+
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+}
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+    debug = true
+}
+
+task obfuscate(type: proguard.gradle.ProGuardTask) {
+    dependsOn "dist"
+    configuration files("proguard-project.txt")
+    libraryjars files("C:/Program Files/Amazon Corretto/jdk1.8.0_242/jre/lib/rt.jar", "C:/Program Files/Amazon Corretto/jdk1.8.0_242/jre/lib/jce.jar")
+    injars files("build/libs/desktop-${version}.jar")
+    outjars files("build/libs/desktop-${version}-pg.jar")
+}
+
+task dist(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+}
+
+
+dist.dependsOn classes
+
+eclipse.project.name = appName + "-desktop"
