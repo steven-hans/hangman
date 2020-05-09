@@ -2,11 +2,9 @@ package me.stevenhans.hangman;
 
 import com.badlogic.gdx.Screen;
 
-public class ResultScreen implements Screen {
-    private Hangman parent;
-
+public class ResultScreen extends SwitchableScreen implements Screen {
     public ResultScreen(Hangman hangman) {
-        parent = hangman;
+        super(hangman);
     }
 
     @Override

@@ -12,19 +12,14 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class GameplayScreen implements Screen {
+public class GameplayScreen extends SwitchableScreen implements Screen {
     private ArrayList<Texture> stick;
     private ArrayList<String> wordlist;
-    private Hangman parent;
-    private Stage stage;
     private SpriteBatch batch;
     private BitmapFont guessFont;
     private BitmapFont infoFont;
@@ -34,21 +29,7 @@ public class GameplayScreen implements Screen {
 
     private HangmanGame game;
 
-    public void resetInputProcessor() {
-        Gdx.input.setInputProcessor(stage);
-    }
-
-    public GameplayScreen(Hangman hangman) {
-        parent = hangman;
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-        batch = new SpriteBatch();
-
-        stick = new ArrayList<>();
-        for (int i = 0; i <= 5; ++i) {
-            stick.add(new Texture(Gdx.files.internal("stick/" + i + ".png")));
-        }
-
+    private void setupFont() {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("PTSerif-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 50;
@@ -59,19 +40,36 @@ public class GameplayScreen implements Screen {
 
         generator.dispose();
 
-        FileHandle file = Gdx.files.internal("wordlist.txt");
-        String text = file.readString();
-
-        wordlist = new ArrayList<>(Arrays.asList(text.split("\n")));
-
         guessFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         guessFont.getData().setScale(1.1f, 1.1f);
 
         infoFont.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         infoFont.getData().setScale(0.85f, 0.85f);
+    }
 
-        game = new HangmanGame(wordlist);
+    private void loadStickAsset() {
+        stick = new ArrayList<>();
+        for (int i = 0; i <= 5; ++i) {
+            stick.add(new Texture(Gdx.files.internal("stick/" + i + ".png")));
+        }
+    }
 
+    private void loadWordList() {
+        FileHandle file = Gdx.files.internal("wordlist.txt");
+        String text = file.readString();
+
+        wordlist = new ArrayList<>(Arrays.asList(text.split("\n")));
+
+    }
+
+    private void setupMusic() {
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/aku_bersyukur.mp3"));
+        backgroundMusic.setLooping(true);
+        loseMusic = Gdx.audio.newMusic(Gdx.files.internal("music/circus_song.mp3"));
+        loseMusic.setLooping(true);
+    }
+
+    private void setupKeyTypedEvent() {
         stage.addListener(new InputListener() {
             @Override
             public boolean keyTyped(InputEvent event, char character) {
@@ -94,11 +92,20 @@ public class GameplayScreen implements Screen {
                 return super.keyTyped(event, character);
             }
         });
+    }
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("music/aku_bersyukur.mp3"));
-        backgroundMusic.setLooping(true);
-        loseMusic = Gdx.audio.newMusic(Gdx.files.internal("music/circus_song.mp3"));
-        loseMusic.setLooping(true);
+    public GameplayScreen(Hangman hangman) {
+        super(hangman);
+        batch = new SpriteBatch();
+
+        loadStickAsset();
+        setupFont();
+
+        loadWordList();
+        game = new HangmanGame(wordlist);
+
+        setupKeyTypedEvent();
+        setupMusic();
     }
 
     @Override
@@ -110,7 +117,7 @@ public class GameplayScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw(stick.get(game.getLife()), Gdx.graphics.getWidth()/2-256, Gdx.graphics.getHeight()/2-100, 300, 300);
+        batch.draw(stick.get(game.getLife()), Gdx.graphics.getWidth() / 2 - 256, Gdx.graphics.getHeight() / 2 - 100, 300, 300);
 
         String sideText;
         if (game.isFinished()) {
@@ -125,7 +132,7 @@ public class GameplayScreen implements Screen {
             }
 
             sideText += "\nPress (r) to restart\nPress (q) to go to menu";
-            guessFont.draw(batch, game.getCurrentWord(), Gdx.graphics.getWidth()/2-256, 96);
+            guessFont.draw(batch, game.getCurrentWord(), Gdx.graphics.getWidth() / 2 - 256, 96);
         } else {
             if (game.getNumberOfGuesses() == 0) {
                 sideText = "Guess now!\nYour life is on the line, after all.";
@@ -138,10 +145,10 @@ public class GameplayScreen implements Screen {
                     sideText = "Correct!\nKeep Guessing!";
                 }
             }
-            guessFont.draw(batch, game.getCurrentFill(), Gdx.graphics.getWidth()/2-256, 96);
+            guessFont.draw(batch, game.getCurrentFill(), Gdx.graphics.getWidth() / 2 - 256, 96);
         }
 
-        infoFont.draw(batch, sideText, Gdx.graphics.getWidth()-256, Gdx.graphics.getHeight()/2+64);
+        infoFont.draw(batch, sideText, Gdx.graphics.getWidth() - 256, Gdx.graphics.getHeight() / 2 + 64);
 
         batch.end();
     }
