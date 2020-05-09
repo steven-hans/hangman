@@ -14,6 +14,7 @@ public class LoadingScreen extends SwitchableScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        // TODO actually load files instead of skipping directly to menu screen.
         parent.changeScreen(ScreenSection.MENU);
     }
 

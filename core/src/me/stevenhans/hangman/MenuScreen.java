@@ -14,6 +14,9 @@ public class MenuScreen extends SwitchableScreen implements Screen {
         super(hangman);
     }
 
+    /**
+     * Menampilkan pilihan yang ada di menu, yaitu Start dan Exit.
+     */
     @Override
     public void show() {
         Table table = new Table();
