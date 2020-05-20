@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * <p>
  * Singkatnya, Hangman adalah permainan tebak kata dimana pemain
  * akan diberikan suatu kata yang seluruh hurufnya tersembunyi.
- * Pemaini akan menebak huruf huruf dari kata ini dengan menebak huruf demi huruf.
+ * Pemain akan menebak huruf huruf dari kata ini dengan menebak huruf demi huruf.
  * Tebakan yang benar akan menampilkan huruf tersebut pada kata yang ditebak.
  * Namun, tebakan yang salah akan menyebabkan gambar orang yang digantung semakin jelas.
  * Apabila pemain salah menebak lima kali, gambar akan selesai dan pemain akan digantung oleh hangman.
