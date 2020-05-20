@@ -18,7 +18,7 @@ public abstract class SwitchableScreen {
     /**
      * Saat suatu SwitchableScreen dibuat, referensi dari kelas game (parent) akan disimpan
      * supaya dapat dilakukan penggantian layar (mengakses fungsi changeScreen).
-     * @param hangman
+     * @param hangman aplikasi hangman.
      */
     protected SwitchableScreen(Hangman hangman) {
         parent = hangman;

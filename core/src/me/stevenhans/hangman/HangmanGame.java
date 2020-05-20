@@ -161,7 +161,7 @@ public class HangmanGame {
     /**
      * Mengembalikan jumlah huruf yang telah ditebak pemain.
      *
-     * @return
+     * @return jumlah semua huruf yang telah ditebak pemain.
      */
     public int getNumberOfGuesses() {
         return guessed.size();

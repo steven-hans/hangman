@@ -10,3 +10,9 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 eclipse.project.name = appName + "-core"
 
+task generateJavadoc(type: Javadoc) {
+    source = sourceSets.main.java.srcDirs
+    classpath = sourceSets.main.runtimeClasspath
+    destinationDir =  file("../docs/")
+}
+
